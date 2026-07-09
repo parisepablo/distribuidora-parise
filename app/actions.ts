@@ -101,7 +101,10 @@ export async function getTodayRegistro() {
 
   return {
     ...registro,
-    ventas: ventas ?? [],
+    ventas: (ventas ?? []).map((v) => ({
+      ...v,
+      producto: v.producto as ProductoId,
+    })),
   };
 }
 
@@ -319,6 +322,11 @@ export async function getHistorialResumen(periodo: "hoy" | "semana" | "mes") {
     throw new Error("No se pudieron cargar las ventas");
   }
 
+  const ventasTipadas = (ventas ?? []).map((v) => ({
+    ...v,
+    producto: v.producto as ProductoId,
+  }));
+
   const { data: recargas, error: recError } = await supabase
     .from("recargas_fabrica")
     .select("fecha, total")
@@ -361,7 +369,7 @@ export async function getHistorialResumen(periodo: "hoy" | "semana" | "mes") {
     gastosTotales,
     gananciaNeta,
     registros: registros ?? [],
-    ventas: ventas ?? [],
+    ventas: ventasTipadas,
     recargas: recargas ?? [],
     gastos: gastos ?? [],
   };
@@ -398,7 +406,7 @@ export async function getHistorialGastos(periodo: "hoy" | "semana" | "mes") {
     tipo: "fabrica" as const,
     fecha: r.fecha,
     descripcion: `Recarga fábrica — ${etiquetaProducto(r.producto as ProductoId).toLowerCase()} × ${r.cantidad}`,
-    monto: r.total,
+    monto: r.total ?? 0,
     categoria: null,
     producto: r.producto as ProductoId,
     cantidad: r.cantidad,
@@ -409,7 +417,7 @@ export async function getHistorialGastos(periodo: "hoy" | "semana" | "mes") {
     tipo: "otro" as const,
     fecha: g.fecha,
     descripcion: g.descripcion,
-    monto: g.monto,
+    monto: g.monto ?? 0,
     categoria: g.categoria as CategoriaGastoId,
     producto: null,
     cantidad: null,
@@ -502,6 +510,7 @@ export async function getTransaccionesCliente(clienteId: string) {
 
   return (data ?? []).map((t) => ({
     ...t,
+    tipo: t.tipo as "entrega" | "pago",
     producto: t.producto as ProductoId | null,
   }));
 }
