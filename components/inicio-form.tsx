@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -23,7 +22,7 @@ import {
 import { saveRegistroDiario } from "@/app/actions";
 import { RecargaModal } from "@/components/recarga-modal";
 import { GastoModal } from "@/components/gasto-modal";
-import { Package, Pencil, AlertTriangle } from "lucide-react";
+import { Pencil, AlertTriangle, TrendingUp } from "lucide-react";
 
 type Precio = {
   producto: ProductoId;
@@ -44,6 +43,12 @@ type Registro = {
   total_cobrado: number;
   notas: string | null;
   ventas: VentaGuardada[];
+};
+
+const ICONOS_PRODUCTO: Record<ProductoId, string> = {
+  bidon_12: "💧",
+  bidon_20: "💧",
+  cajon_soda: "🫧",
 };
 
 export function InicioForm({
@@ -144,7 +149,9 @@ export function InicioForm({
       router.refresh();
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Ocurrió un error al guardar"
+        err instanceof Error
+          ? err.message
+          : "Algo salió mal. Revisá tu conexión e intentá de nuevo."
       );
     } finally {
       setLoading(false);
@@ -157,30 +164,39 @@ export function InicioForm({
   if (!isEditing && registro) {
     return (
       <section className="space-y-6">
-        <h2 className="text-3xl font-bold">Resumen del día</h2>
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold tracking-tight">Resumen del día</h2>
+          <p className="text-base text-muted-foreground">
+            Esto es lo que registraste hoy.
+          </p>
+        </div>
 
-        <Card className="border-border">
-          <CardHeader className="pb-3">
+        <Card className="border-border bg-gradient-to-br from-card to-secondary/30">
+          <CardHeader className="pb-2">
             <CardDescription className="text-base">
               Hoy cobré
             </CardDescription>
-            <CardTitle className="text-3xl text-success">
+            <CardTitle className="text-4xl font-bold text-success">
               {formatearDinero(registro.total_cobrado)}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
             {ventasGuardadas.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-base font-medium text-foreground">
-                  Ventas registradas
-                </p>
-                <ul className="space-y-1 text-base text-muted-foreground">
+              <div className="rounded-xl bg-secondary/50 p-4">
+                <p className="mb-2 text-base font-medium">Ventas registradas</p>
+                <ul className="space-y-2 text-base">
                   {ventasGuardadas.map((v) => (
-                    <li key={v.producto} className="flex justify-between">
-                      <span>
-                        {v.cantidad} {etiquetaProducto(v.producto).toLowerCase()}
+                    <li
+                      key={v.producto}
+                      className="flex items-center justify-between"
+                    >
+                      <span className="text-muted-foreground">
+                        {v.cantidad}{" "}
+                        {etiquetaProducto(v.producto).toLowerCase()}
                       </span>
-                      <span>{formatearDinero(v.cantidad * v.precio_unitario)}</span>
+                      <span className="font-medium">
+                        {formatearDinero(v.cantidad * v.precio_unitario)}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -188,8 +204,10 @@ export function InicioForm({
             )}
 
             {registro.notas && (
-              <div className="rounded-lg bg-muted p-3">
-                <p className="text-base text-foreground">{registro.notas}</p>
+              <div className="rounded-xl bg-secondary/50 p-4">
+                <p className="text-base leading-relaxed text-foreground">
+                  {registro.notas}
+                </p>
               </div>
             )}
 
@@ -197,11 +215,11 @@ export function InicioForm({
               type="button"
               variant="outline"
               size="lg"
-              className="h-12 w-full gap-2 text-base"
+              className="h-14 w-full gap-2 text-base"
               onClick={() => setIsEditing(true)}
             >
               <Pencil className="size-5" />
-              Editar
+              Editar día
             </Button>
 
             <div className="grid gap-3 pt-2">
@@ -216,19 +234,26 @@ export function InicioForm({
 
   return (
     <section className="space-y-6">
-      <h2 className="text-3xl font-bold">¿Cómo te fue hoy?</h2>
+      <div className="space-y-1">
+        <h2 className="text-2xl font-bold tracking-tight">
+          ¿Cómo te fue hoy?
+        </h2>
+        <p className="text-base text-muted-foreground">
+          Cargá las ventas y el total cobrado.
+        </p>
+      </div>
 
       {!preciosConfigurados && (
-        <div className="rounded-lg border border-dashed border-danger/30 bg-red-50 p-4 text-danger">
+        <div className="rounded-2xl border border-danger/30 bg-danger/10 p-5 text-danger">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 size-6 shrink-0" />
             <div>
-              <p className="text-base font-medium">
+              <p className="text-base font-semibold">
                 Configurá tus precios antes de empezar
               </p>
               <Link
                 href="/precios"
-                className="mt-1 inline-block text-base underline"
+                className="mt-1 inline-block text-base underline underline-offset-2"
               >
                 Ir a configurar precios
               </Link>
@@ -237,14 +262,15 @@ export function InicioForm({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Lo que vendiste hoy</h3>
-          <p className="text-base text-muted-foreground">
-            Opcional. Si hoy no vendiste productos, dejá todo en 0.
-          </p>
-
-          <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Lo que vendiste hoy</CardTitle>
+            <CardDescription className="text-base">
+              Opcional. Si no vendiste nada, dejá todo en 0.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
             {PRODUCTOS.map((p) => {
               const cantidad = quantities.get(p.id) || "";
               const precio = preciosMap.get(p.id) ?? 0;
@@ -253,16 +279,18 @@ export function InicioForm({
               return (
                 <div
                   key={p.id}
-                  className="rounded-xl border border-border bg-card p-4"
+                  className="flex items-center gap-4 rounded-xl bg-secondary/40 p-4"
                 >
-                  <div className="mb-3 flex items-center gap-2 text-base font-medium">
-                    <span className="text-xl">
-                      {p.id === "cajon_soda" ? "🫧" : "💧"}
-                    </span>
-                    {p.label}
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary text-2xl">
+                    {ICONOS_PRODUCTO[p.id]}
                   </div>
-
-                  <div className="flex items-center gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-base font-medium">{p.label}</p>
+                    <p className="text-sm text-muted-foreground">
+                      × {formatearDinero(precio)} c/u
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
                     <Input
                       type="text"
                       inputMode="numeric"
@@ -272,68 +300,77 @@ export function InicioForm({
                       onChange={(e) =>
                         handleQuantityChange(p.id, e.target.value)
                       }
-                      className="h-14 min-w-0 flex-1 text-center text-2xl"
+                      className="h-12 w-20 text-center text-xl"
                     />
-                    <div className="min-w-0 text-right text-base leading-tight text-muted-foreground">
-                      <p>× {formatearDinero(precio)} c/u</p>
-                      <p className="font-semibold text-foreground">
-                        = {formatearDinero(subtotal)}
-                      </p>
-                    </div>
+                    <p className="text-sm font-semibold">
+                      = {formatearDinero(subtotal)}
+                    </p>
                   </div>
                 </div>
               );
             })}
-          </div>
 
-          <p className="text-lg font-semibold text-primary">
-            Subtotal calculado: {formatearDinero(subtotalCalculado)}
-          </p>
-        </div>
+            <div className="flex items-center justify-between rounded-xl bg-primary/10 p-4">
+              <span className="text-base font-medium text-primary-foreground/80">
+                Subtotal calculado
+              </span>
+              <span className="text-xl font-bold text-primary">
+                {formatearDinero(subtotalCalculado)}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="space-y-3">
-          <Label htmlFor="total-cobrado" className="text-xl font-semibold">
-            Total cobrado en efectivo
-          </Label>
-          <div className="relative">
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-muted-foreground">
-              $
-            </span>
-            <Input
-              id="total-cobrado"
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              placeholder="0"
-              required
-              value={totalCobrado}
-              onChange={(e) => handleTotalChange(e.target.value)}
-              className="h-16 pl-10 text-3xl font-semibold"
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Total cobrado en efectivo</CardTitle>
+            <CardDescription className="text-base">
+              Podés modificarlo si cobraste otro monto.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-muted-foreground">
+                $
+              </span>
+              <Input
+                id="total-cobrado"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                placeholder="0"
+                required
+                value={totalCobrado}
+                onChange={(e) => handleTotalChange(e.target.value)}
+                className="h-16 pl-10 text-3xl font-bold tracking-tight"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Notas del día</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <textarea
+              id="notas"
+              rows={3}
+              placeholder="Ej: llovió, faltaron bidones en la zona norte…"
+              value={notas}
+              onChange={(e) => setNotas(e.target.value)}
+              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base outline-none ring-ring placeholder:text-muted-foreground focus-visible:ring-2"
             />
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <Label htmlFor="notas" className="text-lg font-medium">
-            Notas del día
-          </Label>
-          <textarea
-            id="notas"
-            rows={3}
-            placeholder="Ej: llovió, faltaron bidones en la zona norte…"
-            value={notas}
-            onChange={(e) => setNotas(e.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-4 py-3 text-base outline-none ring-ring placeholder:text-muted-foreground focus-visible:ring-2"
-          />
-        </div>
+          </CardContent>
+        </Card>
 
         <Button
           type="submit"
           disabled={loading}
           size="lg"
-          className="h-14 w-full gap-2 text-lg"
+          className="h-14 w-full gap-2 text-lg shadow-lg shadow-primary/20"
         >
-          <Package className="size-6" />
+          <TrendingUp className="size-6" />
           {loading ? "Guardando..." : "Guardar día"}
         </Button>
 

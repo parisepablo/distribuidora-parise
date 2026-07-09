@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,8 +30,8 @@ type Periodo = "hoy" | "semana" | "mes";
 
 const PERIODOS: { id: Periodo; label: string }[] = [
   { id: "hoy", label: "Hoy" },
-  { id: "semana", label: "Esta semana" },
-  { id: "mes", label: "Este mes" },
+  { id: "semana", label: "Semana" },
+  { id: "mes", label: "Mes" },
 ];
 
 export function HistorialTabs() {
@@ -112,92 +112,108 @@ export function HistorialTabs() {
 
   return (
     <Tabs defaultValue="resumen" className="w-full">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="resumen" className="text-base">
+      <TabsList className="grid h-14 w-full grid-cols-2 rounded-2xl bg-card p-1">
+        <TabsTrigger
+          value="resumen"
+          className="rounded-xl text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+        >
           Resumen
         </TabsTrigger>
-        <TabsTrigger value="gastos" className="text-base">
+        <TabsTrigger
+          value="gastos"
+          className="rounded-xl text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+        >
           Gastos
         </TabsTrigger>
       </TabsList>
 
-      <div className="mt-4 flex gap-2">
+      <div className="mt-5 grid grid-cols-3 gap-2">
         {PERIODOS.map((p) => (
           <Button
             key={p.id}
             type="button"
             variant={periodo === p.id ? "default" : "outline"}
             onClick={() => setPeriodo(p.id)}
-            className="h-12 flex-1 text-base"
+            className="h-12 rounded-xl text-sm font-medium sm:text-base"
           >
             {p.label}
           </Button>
         ))}
       </div>
 
-      <TabsContent value="resumen" className="mt-4 space-y-4">
+      <TabsContent value="resumen" className="mt-5 space-y-4">
         {loading || !resumen ? (
           <p className="py-8 text-center text-base text-muted-foreground">
             Cargando…
           </p>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Card className="border-border">
-                <CardHeader className="pb-2">
-                  <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Banknote className="size-4" /> Cobrado
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xl font-bold text-success">
-                    {formatearDinero(resumen.cobrado)}
-                  </p>
+                <CardContent className="flex items-center gap-4 p-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-success/10 text-success">
+                    <Banknote className="size-6" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm text-muted-foreground">Cobrado</p>
+                    <p className="text-2xl font-bold text-success">
+                      {formatearDinero(resumen.cobrado)}
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
 
               <Card className="border-border">
-                <CardHeader className="pb-2">
-                  <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Package className="size-4" /> Bidones vendidos
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xl font-bold text-foreground">
-                    {resumen.bidonesVendidos > 0
-                      ? resumen.bidonesVendidos
-                      : "—"}
-                  </p>
+                <CardContent className="flex items-center gap-4 p-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Package className="size-6" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm text-muted-foreground">
+                      Bidones vendidos
+                    </p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {resumen.bidonesVendidos > 0
+                        ? resumen.bidonesVendidos
+                        : "—"}
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
 
               <Card className="border-border">
-                <CardHeader className="pb-2">
-                  <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <TrendingDown className="size-4" /> Gastos
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xl font-bold text-danger">
-                    {formatearDinero(resumen.gastosTotales)}
-                  </p>
+                <CardContent className="flex items-center gap-4 p-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-danger/10 text-danger">
+                    <TrendingDown className="size-6" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm text-muted-foreground">Gastos</p>
+                    <p className="text-2xl font-bold text-danger">
+                      {formatearDinero(resumen.gastosTotales)}
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
 
               <Card className="border-border">
-                <CardHeader className="pb-2">
-                  <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <TrendingUp className="size-4" /> Ganancia neta
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <p
-                    className={`text-xl font-bold ${
-                      resumen.gananciaNeta >= 0 ? "text-success" : "text-danger"
-                    }`}
-                  >
-                    {formatearDinero(resumen.gananciaNeta)}
-                  </p>
+                <CardContent className="flex items-center gap-4 p-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent-foreground">
+                    <TrendingUp className="size-6" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm text-muted-foreground">
+                      Ganancia neta
+                    </p>
+                    <p
+                      className={`text-2xl font-bold ${
+                        resumen.gananciaNeta >= 0
+                          ? "text-success"
+                          : "text-danger"
+                      }`}
+                    >
+                      {formatearDinero(resumen.gananciaNeta)}
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -205,13 +221,13 @@ export function HistorialTabs() {
             <div className="space-y-3">
               <h3 className="text-lg font-semibold">Días del período</h3>
               {resumen.registros.length === 0 ? (
-                <div className="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground">
-                  <Package className="mx-auto mb-3 size-12" />
+                <div className="rounded-2xl border border-border bg-card p-8 text-center">
+                  <Package className="mx-auto mb-4 size-14 text-muted-foreground" />
                   <p className="text-lg font-medium text-foreground">
                     No hay registros
                   </p>
-                  <p className="text-base">
-                    En esta fecha no cargaste ningún día todavía.
+                  <p className="mt-1 text-base text-muted-foreground">
+                    En este período no cargaste ningún día.
                   </p>
                 </div>
               ) : (
@@ -225,79 +241,88 @@ export function HistorialTabs() {
                       <button
                         type="button"
                         onClick={() => toggleRegistro(r.id)}
-                        className="flex w-full items-center justify-between p-4 text-left"
+                        className="flex w-full items-center justify-between gap-3 p-4 text-left"
                       >
-                        <div>
-                          <p className="text-base font-medium capitalize">
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-base font-medium capitalize">
                             {formatearFecha(r.fecha, {
                               weekday: "long",
                               day: "numeric",
                               month: "long",
                             })}
                           </p>
-                          <p className="text-xl font-bold text-success">
+                          <p className="text-2xl font-bold text-success">
                             {formatearDinero(r.total_cobrado)}
                           </p>
                         </div>
-                        {expandido ? (
-                          <ChevronUp className="size-6 text-muted-foreground" />
-                        ) : (
-                          <ChevronDown className="size-6 text-muted-foreground" />
-                        )}
+                        <div className="shrink-0">
+                          {expandido ? (
+                            <ChevronUp className="size-6 text-muted-foreground" />
+                          ) : (
+                            <ChevronDown className="size-6 text-muted-foreground" />
+                          )}
+                        </div>
                       </button>
 
                       {expandido && (
-                        <CardContent className="border-t border-border pt-4">
-                          {ventas.length > 0 && (
-                            <div className="mb-3">
-                              <p className="mb-1 text-base font-medium">
-                                Ventas
-                              </p>
-                              <ul className="space-y-1 text-base text-muted-foreground">
-                                {ventas.map((v) => (
-                                  <li
-                                    key={v.producto}
-                                    className="flex justify-between"
-                                  >
-                                    <span>
-                                      {v.cantidad}{" "}
-                                      {etiquetaProducto(v.producto).toLowerCase()}
-                                    </span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+                        <CardContent className="border-t border-border p-4 pt-4">
+                          <div className="space-y-4">
+                            {ventas.length > 0 && (
+                              <div>
+                                <p className="mb-2 text-sm font-medium uppercase tracking-wide text-muted-foreground">
+                                  Ventas
+                                </p>
+                                <ul className="space-y-2 text-base">
+                                  {ventas.map((v) => (
+                                    <li
+                                      key={v.producto}
+                                      className="flex items-center justify-between"
+                                    >
+                                      <span className="text-muted-foreground">
+                                        {v.cantidad}{" "}
+                                        {etiquetaProducto(
+                                          v.producto
+                                        ).toLowerCase()}
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
 
-                          {gastosDia.length > 0 && (
-                            <div>
-                              <p className="mb-1 text-base font-medium">
-                                Gastos del día
-                              </p>
-                              <ul className="space-y-1 text-base text-muted-foreground">
-                                {gastosDia.map((g, i) => (
-                                  <li key={i} className="flex justify-between">
-                                    <span>
-                                      {g.monto > 0
-                                        ? "Gasto variado"
-                                        : "Recarga"}
-                                    </span>
-                                    <span className="text-danger">
-                                      {formatearDinero(g.monto)}
-                                    </span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+                            {gastosDia.length > 0 && (
+                              <div>
+                                <p className="mb-2 text-sm font-medium uppercase tracking-wide text-muted-foreground">
+                                  Gastos del día
+                                </p>
+                                <ul className="space-y-2 text-base">
+                                  {gastosDia.map((g, i) => (
+                                    <li
+                                      key={i}
+                                      className="flex items-center justify-between"
+                                    >
+                                      <span className="text-muted-foreground">
+                                        {g.monto > 0
+                                          ? "Gasto variado"
+                                          : "Recarga"}
+                                      </span>
+                                      <span className="font-medium text-danger">
+                                        {formatearDinero(g.monto)}
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
 
-                          {r.notas && (
-                            <div className="mt-3 rounded-lg bg-muted p-3">
-                              <p className="text-base text-foreground">
-                                {r.notas}
-                              </p>
-                            </div>
-                          )}
+                            {r.notas && (
+                              <div className="rounded-xl bg-secondary/40 p-3">
+                                <p className="text-base leading-relaxed text-foreground">
+                                  {r.notas}
+                                </p>
+                              </div>
+                            )}
+                          </div>
                         </CardContent>
                       )}
                     </Card>
@@ -309,18 +334,18 @@ export function HistorialTabs() {
         )}
       </TabsContent>
 
-      <TabsContent value="gastos" className="mt-4 space-y-3">
+      <TabsContent value="gastos" className="mt-5 space-y-3">
         {loading || !gastos ? (
           <p className="py-8 text-center text-base text-muted-foreground">
             Cargando…
           </p>
         ) : gastos.length === 0 ? (
-          <div className="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground">
-            <TrendingDown className="mx-auto mb-3 size-12" />
+          <div className="rounded-2xl border border-border bg-card p-8 text-center">
+            <TrendingDown className="mx-auto mb-4 size-14 text-muted-foreground" />
             <p className="text-lg font-medium text-foreground">
               No hay gastos
             </p>
-            <p className="text-base">
+            <p className="mt-1 text-base text-muted-foreground">
               En este período no registraste gastos.
             </p>
           </div>
@@ -332,26 +357,30 @@ export function HistorialTabs() {
 
             return (
               <Card key={`${g.tipo}-${g.id}`} className="border-border">
-                <CardContent className="flex items-start justify-between p-4">
-                  <div>
-                    <p className="text-base font-medium">{g.descripcion}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {formatearFecha(g.fecha, {
-                        weekday: "long",
-                        day: "numeric",
-                        month: "long",
-                      })}
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="break-words text-base font-medium">
+                        {g.descripcion}
+                      </p>
+                      <p className="mt-0.5 text-sm text-muted-foreground">
+                        {formatearFecha(g.fecha, {
+                          weekday: "long",
+                          day: "numeric",
+                          month: "long",
+                        })}
+                      </p>
+                    </div>
+                    <p className="shrink-0 text-xl font-bold text-danger">
+                      {formatearDinero(g.monto)}
                     </p>
-                    <Badge
-                      variant={g.tipo === "fabrica" ? "default" : "secondary"}
-                      className="mt-2"
-                    >
-                      {g.tipo === "fabrica" ? "Fábrica" : categoriaLabel}
-                    </Badge>
                   </div>
-                  <p className="text-xl font-bold text-danger">
-                    {formatearDinero(g.monto)}
-                  </p>
+                  <Badge
+                    variant={g.tipo === "fabrica" ? "default" : "secondary"}
+                    className="mt-3"
+                  >
+                    {g.tipo === "fabrica" ? "Fábrica" : categoriaLabel}
+                  </Badge>
                 </CardContent>
               </Card>
             );

@@ -13,43 +13,6 @@ function fechaHoy(): string {
   return new Date().toISOString().split("T")[0];
 }
 
-async function geocodificarDireccion(
-  direccion: string
-): Promise<{ lat: number; lng: number } | null> {
-  if (!direccion.trim()) return null;
-
-  try {
-    const url = new URL("https://nominatim.openstreetmap.org/search");
-    url.searchParams.set("q", direccion);
-    url.searchParams.set("format", "json");
-    url.searchParams.set("limit", "1");
-    url.searchParams.set("countrycodes", "ar");
-
-    const res = await fetch(url.toString(), {
-      headers: {
-        "User-Agent": "DistribuidoraParise/1.0",
-      },
-      next: { revalidate: 0 },
-    });
-
-    if (!res.ok) return null;
-
-    const data = (await res.json()) as Array<{
-      lat: string;
-      lon: string;
-    }>;
-
-    if (!data || data.length === 0) return null;
-
-    return {
-      lat: parseFloat(data[0].lat),
-      lng: parseFloat(data[0].lon),
-    };
-  } catch {
-    return null;
-  }
-}
-
 function inicioFinPeriodo(periodo: "hoy" | "semana" | "mes"): {
   inicio: string;
   fin: string;
@@ -487,23 +450,25 @@ export async function saveCliente({
   telefono,
   direccion,
   notas,
+  lat,
+  lng,
 }: {
   nombre: string;
   telefono?: string;
   direccion?: string;
   notas?: string;
+  lat?: number;
+  lng?: number;
 }) {
   const supabase = await createClient();
-
-  const coordenadas = await geocodificarDireccion(direccion ?? "");
 
   const { error } = await supabase.from("clientes").insert({
     nombre: nombre.trim(),
     telefono: telefono?.trim() || null,
     direccion: direccion?.trim() || null,
     notas: notas?.trim() || null,
-    lat: coordenadas?.lat ?? null,
-    lng: coordenadas?.lng ?? null,
+    lat: lat ?? null,
+    lng: lng ?? null,
   });
 
   if (error) {
@@ -511,6 +476,46 @@ export async function saveCliente({
   }
 
   revalidatePath("/clientes");
+  return { ok: true };
+}
+
+export async function updateCliente({
+  id,
+  nombre,
+  telefono,
+  direccion,
+  notas,
+  lat,
+  lng,
+}: {
+  id: string;
+  nombre: string;
+  telefono?: string;
+  direccion?: string;
+  notas?: string;
+  lat?: number;
+  lng?: number;
+}) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("clientes")
+    .update({
+      nombre: nombre.trim(),
+      telefono: telefono?.trim() || null,
+      direccion: direccion?.trim() || null,
+      notas: notas?.trim() || null,
+      lat: lat ?? null,
+      lng: lng ?? null,
+    })
+    .eq("id", id);
+
+  if (error) {
+    throw new Error("No se pudo actualizar el cliente");
+  }
+
+  revalidatePath("/clientes");
+  revalidatePath(`/clientes/${id}`);
   return { ok: true };
 }
 

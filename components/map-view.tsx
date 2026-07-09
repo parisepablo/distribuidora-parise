@@ -29,7 +29,7 @@ export function MapView({
   const position: LatLngExpression = [lat, lng];
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border">
+    <div className="overflow-hidden rounded-2xl border border-border">
       <MapContainer
         center={position}
         zoom={15}

@@ -17,8 +17,10 @@ export default async function PreciosPage() {
 
   return (
     <section className="space-y-6">
-      <div className="space-y-2">
-        <h2 className="text-3xl font-bold">Configurar precios</h2>
+      <div className="space-y-1">
+        <h2 className="text-2xl font-bold tracking-tight">
+          Configurar precios
+        </h2>
         <p className="text-base text-muted-foreground">
           Actualizá lo que pagás a la fábrica y lo que cobrás a tus clientes.
         </p>

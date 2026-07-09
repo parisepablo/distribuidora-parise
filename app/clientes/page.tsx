@@ -2,25 +2,25 @@ import Link from "next/link";
 import { getClientes } from "@/app/actions";
 import { ClienteNuevoModal } from "@/components/cliente-nuevo-modal";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, Phone, MapPin, ChevronRight } from "lucide-react";
+import { Phone, MapPin, ChevronRight, Users } from "lucide-react";
 
 export default async function ClientesPage() {
   const clientes = await getClientes();
 
   return (
     <section className="space-y-6">
-      <div className="space-y-2">
-        <h2 className="text-3xl font-bold">Clientes</h2>
+      <div className="space-y-1">
+        <h2 className="text-2xl font-bold tracking-tight">Clientes</h2>
         <p className="text-base text-muted-foreground">
           Direcciones y cuentas corrientes.
         </p>
       </div>
 
       {clientes.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground">
-          <Users className="mx-auto mb-3 size-12" />
+        <div className="rounded-2xl border border-border bg-card p-8 text-center">
+          <Users className="mx-auto mb-4 size-14 text-muted-foreground" />
           <p className="text-lg font-medium text-foreground">Sin clientes aún</p>
-          <p className="mt-1 text-base">
+          <p className="mt-1 text-base text-muted-foreground">
             Agregá un cliente para llevar su cuenta y dirección de entrega.
           </p>
         </div>
@@ -28,23 +28,26 @@ export default async function ClientesPage() {
         <div className="space-y-3">
           {clientes.map((cliente) => (
             <Link key={cliente.id} href={`/clientes/${cliente.id}`}>
-              <Card className="border-border transition-colors hover:bg-muted/50">
-                <CardContent className="flex items-center justify-between p-4">
-                  <div className="min-w-0">
+              <Card className="border-border transition-colors hover:border-primary/50 hover:bg-secondary/30">
+                <CardContent className="flex items-center gap-4 p-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary text-xl font-bold text-primary">
+                    {cliente.nombre.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
                     <p className="truncate text-lg font-semibold text-foreground">
                       {cliente.nombre}
                     </p>
-                    <div className="mt-1 flex flex-wrap items-center gap-3 text-base text-muted-foreground">
+                    <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                       {cliente.telefono && (
                         <span className="flex items-center gap-1">
                           <Phone className="size-4" />
-                          {cliente.telefono}
+                          <span className="truncate">{cliente.telefono}</span>
                         </span>
                       )}
                       {cliente.direccion && (
                         <span className="flex items-center gap-1 truncate">
                           <MapPin className="size-4" />
-                          {cliente.direccion}
+                          <span className="truncate">{cliente.direccion}</span>
                         </span>
                       )}
                     </div>

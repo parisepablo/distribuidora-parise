@@ -17,6 +17,12 @@ import { formatearFecha, ProductoId } from "@/lib/constants";
 import { savePrecio } from "@/app/actions";
 import { Save } from "lucide-react";
 
+const ICONOS_PRODUCTO: Record<ProductoId, string> = {
+  bidon_12: "💧",
+  bidon_20: "💧",
+  cajon_soda: "🫧",
+};
+
 export function PrecioCard({
   producto,
   label,
@@ -59,7 +65,9 @@ export function PrecioCard({
       router.refresh();
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Ocurrió un error al guardar"
+        err instanceof Error
+          ? err.message
+          : "Algo salió mal. Revisá tu conexión e intentá de nuevo."
       );
     } finally {
       setLoading(false);
@@ -69,16 +77,21 @@ export function PrecioCard({
   return (
     <Card className="border-border">
       <CardHeader className="pb-3">
-        <CardTitle className="text-xl">
-          {producto === "cajon_soda" ? "🫧" : "💧"} {label}
-        </CardTitle>
-        <CardDescription className="text-base">
-          Cuando guardes, los precios anteriores quedan guardados en el historial.
-        </CardDescription>
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-2xl">
+            {ICONOS_PRODUCTO[producto]}
+          </span>
+          <div>
+            <CardTitle className="text-xl">{label}</CardTitle>
+            <CardDescription className="text-base">
+              Cuando guardes, el precio anterior queda en el historial.
+            </CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-5">
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor={`costo-${producto}`} className="text-base">
                 Precio de costo
@@ -96,7 +109,7 @@ export function PrecioCard({
                   required
                   value={costo}
                   onChange={(e) => setCosto(limpiarNumero(e.target.value))}
-                  className="h-12 pl-9 text-lg"
+                  className="h-14 pl-9 text-lg"
                 />
               </div>
             </div>
@@ -118,16 +131,14 @@ export function PrecioCard({
                   required
                   value={venta}
                   onChange={(e) => setVenta(limpiarNumero(e.target.value))}
-                  className="h-12 pl-9 text-lg"
+                  className="h-14 pl-9 text-lg"
                 />
               </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-base text-muted-foreground">
-              Vigente desde
-            </Label>
+          <div className="rounded-xl bg-secondary/40 p-4">
+            <p className="text-sm text-muted-foreground">Vigente desde</p>
             <p className="text-base font-medium">
               {formatearFecha(hoy, {
                 weekday: "long",
@@ -140,7 +151,7 @@ export function PrecioCard({
           <Button
             type="submit"
             disabled={loading}
-            className="h-12 w-full gap-2 text-base"
+            className="h-14 w-full gap-2 text-base shadow-lg shadow-primary/20"
           >
             <Save className="size-5" />
             {loading ? "Guardando..." : "Guardar precio"}

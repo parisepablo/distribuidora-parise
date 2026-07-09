@@ -17,6 +17,12 @@ import { formatearDinero, ProductoId, PRODUCTOS } from "@/lib/constants";
 import { saveRecargaFabrica } from "@/app/actions";
 import { Factory } from "lucide-react";
 
+const ICONOS_PRODUCTO: Record<ProductoId, string> = {
+  bidon_12: "💧",
+  bidon_20: "💧",
+  cajon_soda: "🫧",
+};
+
 export function RecargaModal({
   precios,
 }: {
@@ -104,7 +110,7 @@ export function RecargaModal({
         type="button"
         variant="outline"
         size="lg"
-        className="h-12 w-full gap-2 text-base"
+        className="h-14 w-full gap-2 text-base"
         onClick={() => setOpen(true)}
       >
         <Factory className="size-5" />
@@ -112,15 +118,18 @@ export function RecargaModal({
       </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl">
+        <SheetContent side="bottom" className="h-[92vh] rounded-t-3xl">
           <SheetHeader className="text-left">
             <SheetTitle className="text-xl">Recarga en fábrica</SheetTitle>
             <SheetDescription className="text-base">
-              ¿Cuántos productos cargaste hoy en la fábrica?
+              ¿Cuántos productos cargaste en la fábrica?
             </SheetDescription>
           </SheetHeader>
 
-          <form onSubmit={handleSubmit} className="flex flex-1 flex-col gap-5 overflow-y-auto p-4">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-1 flex-col gap-5 overflow-y-auto p-4"
+          >
             <div className="space-y-4">
               {PRODUCTOS.map((p) => {
                 const cantidad = quantities[p.id] || "";
@@ -130,16 +139,18 @@ export function RecargaModal({
                 return (
                   <div
                     key={p.id}
-                    className="rounded-xl border border-border bg-card p-4"
+                    className="flex items-center gap-4 rounded-xl bg-secondary/40 p-4"
                   >
-                    <div className="mb-3 flex items-center gap-2 text-base font-medium">
-                      <span className="text-xl">
-                        {p.id === "cajon_soda" ? "🫧" : "💧"}
-                      </span>
-                      {p.label}
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary text-2xl">
+                      {ICONOS_PRODUCTO[p.id]}
                     </div>
-
-                    <div className="flex items-center gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-base font-medium">{p.label}</p>
+                      <p className="text-sm text-muted-foreground">
+                        × {formatearDinero(costo)} costo c/u
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 flex-col items-end gap-1">
                       <Input
                         type="text"
                         inputMode="numeric"
@@ -149,23 +160,23 @@ export function RecargaModal({
                         onChange={(e) =>
                           handleQuantityChange(p.id, e.target.value)
                         }
-                        className="h-14 min-w-0 flex-1 text-center text-2xl"
+                        className="h-12 w-20 text-center text-xl"
                       />
-                      <div className="min-w-0 text-right text-base leading-tight text-muted-foreground">
-                        <p>× {formatearDinero(costo)} costo c/u</p>
-                        <p className="font-semibold text-foreground">
-                          = {formatearDinero(subtotal)}
-                        </p>
-                      </div>
+                      <p className="text-sm font-semibold">
+                        = {formatearDinero(subtotal)}
+                      </p>
                     </div>
                   </div>
                 );
               })}
             </div>
 
-            <p className="text-lg font-semibold text-primary">
-              Total a pagar en fábrica: {formatearDinero(total)}
-            </p>
+            <div className="rounded-xl bg-danger/10 p-4">
+              <p className="text-sm text-danger/80">Total a pagar en fábrica</p>
+              <p className="text-3xl font-bold text-danger">
+                {formatearDinero(total)}
+              </p>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="recarga-fecha" className="text-base">
@@ -177,7 +188,7 @@ export function RecargaModal({
                 required
                 value={fecha}
                 onChange={(e) => setFecha(e.target.value)}
-                className="h-12 text-base"
+                className="h-14 text-base"
               />
             </div>
 
@@ -191,7 +202,7 @@ export function RecargaModal({
                 placeholder="Ej: pagué en efectivo, faltaron cajones…"
                 value={notas}
                 onChange={(e) => setNotas(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-base outline-none ring-ring placeholder:text-muted-foreground focus-visible:ring-2"
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base outline-none ring-ring placeholder:text-muted-foreground focus-visible:ring-2"
               />
             </div>
 
@@ -199,7 +210,7 @@ export function RecargaModal({
               <Button
                 type="submit"
                 disabled={loading || total <= 0}
-                className="h-14 w-full gap-2 text-lg"
+                className="h-14 w-full gap-2 text-lg shadow-lg shadow-primary/20"
               >
                 {loading ? "Guardando..." : "Guardar recarga"}
               </Button>

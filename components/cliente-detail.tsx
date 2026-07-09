@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { MapView } from "@/components/map-view";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,6 +13,8 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { MapView } from "@/components/map-view";
+import { ClienteEditModal } from "@/components/cliente-edit-modal";
 import {
   formatearDinero,
   formatearFecha,
@@ -68,21 +69,7 @@ export function ClienteDetail({
 
   return (
     <section className="space-y-6">
-      <div className="space-y-2">
-        <h2 className="text-3xl font-bold">{cliente.nombre}</h2>
-        {cliente.telefono && (
-          <p className="flex items-center gap-2 text-base text-muted-foreground">
-            <Phone className="size-5" />
-            {cliente.telefono}
-          </p>
-        )}
-        {cliente.direccion && (
-          <p className="flex items-center gap-2 text-base text-muted-foreground">
-            <MapPin className="size-5" />
-            {cliente.direccion}
-          </p>
-        )}
-      </div>
+      <CardInfo cliente={cliente} />
 
       {cliente.lat != null && cliente.lng != null ? (
         <MapView
@@ -98,7 +85,7 @@ export function ClienteDetail({
             )}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="block rounded-xl border border-border bg-card p-4 text-base text-primary underline"
+            className="block rounded-xl border border-border bg-card p-4 text-base text-primary underline underline-offset-2"
           >
             Ver dirección en OpenStreetMap
           </a>
@@ -106,15 +93,15 @@ export function ClienteDetail({
       )}
 
       {cliente.notas && (
-        <div className="rounded-lg bg-muted p-4">
-          <p className="flex items-start gap-2 text-base text-foreground">
-            <FileText className="mt-0.5 size-5 shrink-0" />
+        <div className="rounded-xl border border-border bg-card p-4">
+          <p className="flex items-start gap-3 text-base leading-relaxed text-foreground">
+            <FileText className="mt-0.5 size-5 shrink-0 text-primary" />
             {cliente.notas}
           </p>
         </div>
       )}
 
-      <div className="rounded-xl border border-border bg-card p-5">
+      <div className="rounded-2xl border border-border bg-card p-5">
         <h3 className="text-lg font-semibold">Cuenta corriente</h3>
         {balance === 0 ? (
           <p className="mt-2 flex items-center gap-2 text-2xl font-bold text-success">
@@ -131,26 +118,30 @@ export function ClienteDetail({
           </p>
         )}
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <EntregaModal clienteId={cliente.id} />
           <PagoModal clienteId={cliente.id} />
         </div>
       </div>
 
       <div className="space-y-3">
-        <h3 className="text-lg font-semibold">Movimientos</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Movimientos</h3>
+        </div>
         {transacciones.length === 0 ? (
-          <p className="rounded-lg border border-border bg-card p-6 text-center text-base text-muted-foreground">
-            No hay movimientos registrados.
-          </p>
+          <div className="rounded-xl border border-border bg-card p-6 text-center">
+            <p className="text-base text-muted-foreground">
+              No hay movimientos registrados.
+            </p>
+          </div>
         ) : (
           transacciones.map((t) => (
             <div
               key={t.id}
-              className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
+              className="flex items-center justify-between rounded-xl border border-border bg-card p-4"
             >
-              <div>
-                <p className="text-base font-medium">
+              <div className="min-w-0 flex-1 pr-3">
+                <p className="truncate text-base font-medium">
                   {t.tipo === "entrega"
                     ? `Entrega: ${t.cantidad ?? 0} ${etiquetaProducto(
                         t.producto as ProductoId
@@ -166,7 +157,7 @@ export function ClienteDetail({
                 </p>
               </div>
               <p
-                className={`text-xl font-bold ${
+                className={`shrink-0 text-xl font-bold ${
                   t.tipo === "entrega" ? "text-danger" : "text-success"
                 }`}
               >
@@ -178,6 +169,43 @@ export function ClienteDetail({
         )}
       </div>
     </section>
+  );
+}
+
+function CardInfo({ cliente }: { cliente: Cliente }) {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-2xl font-bold tracking-tight">{cliente.nombre}</h2>
+        </div>
+        <div className="shrink-0">
+          <ClienteEditModal cliente={cliente} />
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        {cliente.telefono && (
+          <a
+            href={`tel:${cliente.telefono.replace(/\s/g, "")}`}
+            className="flex items-center gap-3 text-base text-muted-foreground transition-colors hover:text-primary"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary">
+              <Phone className="size-5" />
+            </div>
+            <span className="break-all">{cliente.telefono}</span>
+          </a>
+        )}
+        {cliente.direccion && (
+          <div className="flex items-start gap-3 text-base text-muted-foreground">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary">
+              <MapPin className="size-5" />
+            </div>
+            <span className="break-words leading-snug">{cliente.direccion}</span>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -228,7 +256,7 @@ function EntregaModal({ clienteId }: { clienteId: string }) {
       <Button
         type="button"
         variant="outline"
-        className="h-12 w-full gap-2 text-base"
+        className="h-14 w-full gap-2 text-base"
         onClick={() => setOpen(true)}
       >
         <Package className="size-5" />
@@ -236,7 +264,7 @@ function EntregaModal({ clienteId }: { clienteId: string }) {
       </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl">
+        <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl">
           <SheetHeader className="text-left">
             <SheetTitle className="text-xl">Apuntar entrega</SheetTitle>
             <SheetDescription className="text-base">
@@ -257,9 +285,12 @@ function EntregaModal({ clienteId }: { clienteId: string }) {
                     type="button"
                     variant={producto === p.id ? "default" : "outline"}
                     onClick={() => setProducto(p.id)}
-                    className="h-12 justify-start text-base"
+                    className="h-14 justify-start gap-3 text-base"
                   >
-                    {p.id === "cajon_soda" ? "🫧" : "💧"} {p.label}
+                    <span className="text-xl">
+                      {p.id === "cajon_soda" ? "🫧" : "💧"}
+                    </span>
+                    {p.label}
                   </Button>
                 ))}
               </div>
@@ -280,7 +311,7 @@ function EntregaModal({ clienteId }: { clienteId: string }) {
                   onChange={(e) =>
                     setCantidad(e.target.value.replace(/\D/g, ""))
                   }
-                  className="h-12 text-center text-xl"
+                  className="h-14 text-center text-xl"
                 />
               </div>
               <div className="space-y-2">
@@ -297,7 +328,7 @@ function EntregaModal({ clienteId }: { clienteId: string }) {
                   onChange={(e) =>
                     setPrecioUnitario(e.target.value.replace(/\D/g, ""))
                   }
-                  className="h-12 text-center text-xl"
+                  className="h-14 text-center text-xl"
                 />
               </div>
             </div>
@@ -318,7 +349,7 @@ function EntregaModal({ clienteId }: { clienteId: string }) {
                   required
                   value={monto}
                   onChange={(e) => setMonto(e.target.value.replace(/\D/g, ""))}
-                  className="h-14 pl-10 text-2xl font-semibold"
+                  className="h-16 pl-10 text-3xl font-bold"
                 />
               </div>
             </div>
@@ -333,7 +364,7 @@ function EntregaModal({ clienteId }: { clienteId: string }) {
                 required
                 value={fecha}
                 onChange={(e) => setFecha(e.target.value)}
-                className="h-12 text-base"
+                className="h-14 text-base"
               />
             </div>
 
@@ -346,7 +377,7 @@ function EntregaModal({ clienteId }: { clienteId: string }) {
                 rows={2}
                 value={notas}
                 onChange={(e) => setNotas(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-base outline-none ring-ring placeholder:text-muted-foreground focus-visible:ring-2"
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base outline-none ring-ring placeholder:text-muted-foreground focus-visible:ring-2"
               />
             </div>
 
@@ -354,7 +385,7 @@ function EntregaModal({ clienteId }: { clienteId: string }) {
               <Button
                 type="submit"
                 disabled={loading}
-                className="h-14 w-full gap-2 text-lg"
+                className="h-14 w-full gap-2 text-lg shadow-lg shadow-primary/20"
               >
                 {loading ? "Guardando..." : "Guardar entrega"}
               </Button>
@@ -415,7 +446,7 @@ function PagoModal({ clienteId }: { clienteId: string }) {
       <Button
         type="button"
         variant="outline"
-        className="h-12 w-full gap-2 text-base"
+        className="h-14 w-full gap-2 text-base"
         onClick={() => setOpen(true)}
       >
         <Banknote className="size-5" />
@@ -423,7 +454,7 @@ function PagoModal({ clienteId }: { clienteId: string }) {
       </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl">
+        <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl">
           <SheetHeader className="text-left">
             <SheetTitle className="text-xl">Apuntar pago</SheetTitle>
             <SheetDescription className="text-base">
@@ -451,7 +482,7 @@ function PagoModal({ clienteId }: { clienteId: string }) {
                   required
                   value={monto}
                   onChange={(e) => setMonto(e.target.value.replace(/\D/g, ""))}
-                  className="h-16 pl-10 text-3xl font-semibold"
+                  className="h-16 pl-10 text-3xl font-bold"
                 />
               </div>
             </div>
@@ -466,7 +497,7 @@ function PagoModal({ clienteId }: { clienteId: string }) {
                 required
                 value={fecha}
                 onChange={(e) => setFecha(e.target.value)}
-                className="h-12 text-base"
+                className="h-14 text-base"
               />
             </div>
 
@@ -479,7 +510,7 @@ function PagoModal({ clienteId }: { clienteId: string }) {
                 rows={2}
                 value={notas}
                 onChange={(e) => setNotas(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-base outline-none ring-ring placeholder:text-muted-foreground focus-visible:ring-2"
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base outline-none ring-ring placeholder:text-muted-foreground focus-visible:ring-2"
               />
             </div>
 
@@ -487,7 +518,7 @@ function PagoModal({ clienteId }: { clienteId: string }) {
               <Button
                 type="submit"
                 disabled={loading}
-                className="h-14 w-full gap-2 text-lg"
+                className="h-14 w-full gap-2 text-lg shadow-lg shadow-primary/20"
               >
                 {loading ? "Guardando..." : "Guardar pago"}
               </Button>

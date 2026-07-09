@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Droplets } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,12 +46,24 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-[60vh] flex-col justify-center">
-      <Card className="border-border shadow-sm">
+    <div className="flex min-h-[70vh] flex-col justify-center">
+      <div className="mb-6 text-center">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <Droplets className="size-9" />
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Distribuidora Parise
+        </h1>
+        <p className="mt-1 text-base text-muted-foreground">
+          Control diario de entregas
+        </p>
+      </div>
+
+      <Card className="border-border">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">Ingresar</CardTitle>
           <CardDescription className="text-base">
-            Accedé con tu correo y contraseña para continuar.
+            Accedé con tu correo y contraseña.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -68,7 +81,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tucorreo@ejemplo.com"
-                className="h-12 text-base"
+                className="h-14 text-base"
               />
             </div>
 
@@ -84,14 +97,14 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="h-12 text-base"
+                className="h-14 text-base"
               />
             </div>
 
             {error && (
               <p
                 role="alert"
-                className="rounded-md bg-red-50 p-3 text-base text-danger"
+                className="rounded-xl bg-danger/10 p-3 text-base text-danger"
               >
                 {error}
               </p>
@@ -100,7 +113,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="h-12 w-full text-base"
+              className="h-14 w-full text-base shadow-lg shadow-primary/20"
             >
               {loading ? "Ingresando..." : "Ingresar"}
             </Button>

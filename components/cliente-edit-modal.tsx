@@ -14,38 +14,39 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { MapPicker } from "@/components/map-picker";
-import { saveCliente } from "@/app/actions";
-import { UserPlus, MapPin, X } from "lucide-react";
+import { updateCliente } from "@/app/actions";
+import { Pencil, MapPin, X } from "lucide-react";
 
-export function ClienteNuevoModal() {
+type Cliente = {
+  id: string;
+  nombre: string;
+  telefono: string | null;
+  direccion: string | null;
+  lat: number | null;
+  lng: number | null;
+  notas: string | null;
+};
+
+export function ClienteEditModal({ cliente }: { cliente: Cliente }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [mostrarMapa, setMostrarMapa] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [nombre, setNombre] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [direccion, setDireccion] = useState("");
-  const [lat, setLat] = useState<number | undefined>();
-  const [lng, setLng] = useState<number | undefined>();
-  const [notas, setNotas] = useState("");
-
-  function resetForm() {
-    setNombre("");
-    setTelefono("");
-    setDireccion("");
-    setLat(undefined);
-    setLng(undefined);
-    setNotas("");
-    setMostrarMapa(false);
-  }
+  const [nombre, setNombre] = useState(cliente.nombre);
+  const [telefono, setTelefono] = useState(cliente.telefono ?? "");
+  const [direccion, setDireccion] = useState(cliente.direccion ?? "");
+  const [lat, setLat] = useState<number | undefined>(cliente.lat ?? undefined);
+  const [lng, setLng] = useState<number | undefined>(cliente.lng ?? undefined);
+  const [notas, setNotas] = useState(cliente.notas ?? "");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
 
     try {
-      await saveCliente({
+      await updateCliente({
+        id: cliente.id,
         nombre,
         telefono,
         direccion,
@@ -53,9 +54,8 @@ export function ClienteNuevoModal() {
         lat,
         lng,
       });
-      toast.success("✅ Cliente guardado");
+      toast.success("✅ Cliente actualizado");
       setOpen(false);
-      resetForm();
       router.refresh();
     } catch (err) {
       toast.error(
@@ -83,21 +83,21 @@ export function ClienteNuevoModal() {
     <>
       <Button
         type="button"
+        variant="outline"
         size="lg"
-        className="h-14 w-full gap-2 text-lg shadow-lg shadow-primary/20"
+        className="h-12 w-full gap-2 text-base"
         onClick={() => setOpen(true)}
       >
-        <UserPlus className="size-6" />
-        Nuevo cliente
+        <Pencil className="size-5" />
+        Editar cliente
       </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="bottom" className="h-[92vh] rounded-t-3xl">
           <SheetHeader className="text-left">
-            <SheetTitle className="text-xl">Nuevo cliente</SheetTitle>
+            <SheetTitle className="text-xl">Editar cliente</SheetTitle>
             <SheetDescription className="text-base">
-              Agregá los datos de contacto y elegí la ubicación correcta en el
-              mapa.
+              Modificá los datos y la ubicación en el mapa.
             </SheetDescription>
           </SheetHeader>
 
@@ -108,13 +108,12 @@ export function ClienteNuevoModal() {
             {!mostrarMapa ? (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="cliente-nombre" className="text-base">
+                  <Label htmlFor="editar-nombre" className="text-base">
                     Nombre
                   </Label>
                   <Input
-                    id="cliente-nombre"
+                    id="editar-nombre"
                     type="text"
-                    placeholder="Ej: Juan Pérez"
                     required
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
@@ -123,14 +122,13 @@ export function ClienteNuevoModal() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="cliente-telefono" className="text-base">
+                  <Label htmlFor="editar-telefono" className="text-base">
                     Teléfono
                   </Label>
                   <Input
-                    id="cliente-telefono"
+                    id="editar-telefono"
                     type="tel"
                     inputMode="tel"
-                    placeholder="Ej: 11 1234-5678"
                     value={telefono}
                     onChange={(e) => setTelefono(e.target.value)}
                     className="h-14 text-base"
@@ -164,20 +162,15 @@ export function ClienteNuevoModal() {
                       Elegir dirección en el mapa
                     </Button>
                   )}
-                  <p className="text-sm text-muted-foreground">
-                    Buscá la dirección y elegí el resultado correcto para evitar
-                    confusiones.
-                  </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="cliente-notas" className="text-base">
+                  <Label htmlFor="editar-notas" className="text-base">
                     Notas
                   </Label>
                   <textarea
-                    id="cliente-notas"
+                    id="editar-notas"
                     rows={2}
-                    placeholder="Ej: timbre roto, atiende por la mañana…"
                     value={notas}
                     onChange={(e) => setNotas(e.target.value)}
                     className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base outline-none ring-ring placeholder:text-muted-foreground focus-visible:ring-2"
@@ -190,7 +183,7 @@ export function ClienteNuevoModal() {
                     disabled={loading}
                     className="h-14 w-full gap-2 text-lg shadow-lg shadow-primary/20"
                   >
-                    {loading ? "Guardando..." : "Guardar cliente"}
+                    {loading ? "Guardando..." : "Guardar cambios"}
                   </Button>
                   <Button
                     type="button"
@@ -205,9 +198,7 @@ export function ClienteNuevoModal() {
             ) : (
               <div className="flex h-full flex-col">
                 <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">
-                    Elegir ubicación
-                  </h3>
+                  <h3 className="text-lg font-semibold">Elegir ubicación</h3>
                   <Button
                     type="button"
                     variant="ghost"

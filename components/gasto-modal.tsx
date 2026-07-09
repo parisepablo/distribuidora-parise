@@ -72,7 +72,7 @@ export function GastoModal() {
         type="button"
         variant="outline"
         size="lg"
-        className="h-12 w-full gap-2 text-base"
+        className="h-14 w-full gap-2 text-base"
         onClick={() => setOpen(true)}
       >
         <Receipt className="size-5" />
@@ -80,7 +80,7 @@ export function GastoModal() {
       </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl">
+        <SheetContent side="bottom" className="h-[92vh] rounded-t-3xl">
           <SheetHeader className="text-left">
             <SheetTitle className="text-xl">Otro gasto</SheetTitle>
             <SheetDescription className="text-base">
@@ -103,7 +103,7 @@ export function GastoModal() {
                 required
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
-                className="h-12 text-base"
+                className="h-14 text-base"
               />
             </div>
 
@@ -124,7 +124,7 @@ export function GastoModal() {
                   required
                   value={monto}
                   onChange={(e) => handleMontoChange(e.target.value)}
-                  className="h-16 pl-10 text-3xl font-semibold"
+                  className="h-16 pl-10 text-3xl font-bold"
                 />
               </div>
             </div>
@@ -138,7 +138,7 @@ export function GastoModal() {
                     type="button"
                     variant={categoria === cat.id ? "default" : "outline"}
                     onClick={() => setCategoria(cat.id)}
-                    className="h-12 text-base"
+                    className="h-14 text-base"
                   >
                     {cat.label}
                   </Button>
@@ -156,7 +156,7 @@ export function GastoModal() {
                 required
                 value={fecha}
                 onChange={(e) => setFecha(e.target.value)}
-                className="h-12 text-base"
+                className="h-14 text-base"
               />
             </div>
 
@@ -164,7 +164,7 @@ export function GastoModal() {
               <Button
                 type="submit"
                 disabled={loading || !monto}
-                className="h-14 w-full gap-2 text-lg"
+                className="h-14 w-full gap-2 text-lg shadow-lg shadow-primary/20"
               >
                 {loading ? "Guardando..." : "Guardar gasto"}
               </Button>
