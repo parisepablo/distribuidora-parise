@@ -13,7 +13,6 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { GooglePlacesInput } from "@/components/google-places-input";
 import { saveCliente } from "@/app/actions";
 import { UserPlus } from "lucide-react";
 
@@ -25,16 +24,12 @@ export function ClienteNuevoModal() {
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
   const [direccion, setDireccion] = useState("");
-  const [lat, setLat] = useState<number | undefined>();
-  const [lng, setLng] = useState<number | undefined>();
   const [notas, setNotas] = useState("");
 
   function resetForm() {
     setNombre("");
     setTelefono("");
     setDireccion("");
-    setLat(undefined);
-    setLng(undefined);
     setNotas("");
   }
 
@@ -48,8 +43,6 @@ export function ClienteNuevoModal() {
         telefono,
         direccion,
         notas,
-        lat,
-        lng,
       });
       toast.success("✅ Cliente guardado");
       setOpen(false);
@@ -121,17 +114,22 @@ export function ClienteNuevoModal() {
               />
             </div>
 
-            <GooglePlacesInput
-              id="cliente-direccion"
-              label="Dirección"
-              placeholder="Ej: Av. Corrientes 1234, CABA"
-              value={direccion}
-              onChange={setDireccion}
-              onPlaceSelected={(place) => {
-                setLat(place.lat);
-                setLng(place.lng);
-              }}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="cliente-direccion" className="text-base">
+                Dirección
+              </Label>
+              <textarea
+                id="cliente-direccion"
+                rows={2}
+                placeholder="Ej: Av. Corrientes 1234, CABA"
+                value={direccion}
+                onChange={(e) => setDireccion(e.target.value)}
+                className="w-full rounded-lg border border-border bg-background px-4 py-3 text-base outline-none ring-ring placeholder:text-muted-foreground focus-visible:ring-2"
+              />
+              <p className="text-sm text-muted-foreground">
+                Se va a buscar la ubicación en el mapa automáticamente.
+              </p>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="cliente-notas" className="text-base">

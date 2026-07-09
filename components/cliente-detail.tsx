@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { MapView } from "@/components/map-view";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -59,19 +59,12 @@ export function ClienteDetail({
   cliente: Cliente;
   transacciones: Transaccion[];
 }) {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-
   const balance = useMemo(() => {
     return transacciones.reduce((sum, t) => {
       if (t.tipo === "entrega") return sum + t.monto;
       return sum - t.monto;
     }, 0);
   }, [transacciones]);
-
-  const mapUrl =
-    cliente.lat != null && cliente.lng != null && apiKey
-      ? `https://maps.googleapis.com/maps/api/staticmap?center=${cliente.lat},${cliente.lng}&zoom=15&size=600x300&markers=${cliente.lat},${cliente.lng}&key=${apiKey}`
-      : null;
 
   return (
     <section className="space-y-6">
@@ -91,17 +84,25 @@ export function ClienteDetail({
         )}
       </div>
 
-      {mapUrl && (
-        <div className="overflow-hidden rounded-xl border border-border">
-          <Image
-            src={mapUrl}
-            alt={`Mapa de ${cliente.direccion}`}
-            width={600}
-            height={300}
-            className="h-auto w-full object-cover"
-            unoptimized
-          />
-        </div>
+      {cliente.lat != null && cliente.lng != null ? (
+        <MapView
+          lat={cliente.lat}
+          lng={cliente.lng}
+          label={cliente.direccion ?? undefined}
+        />
+      ) : (
+        cliente.direccion && (
+          <a
+            href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(
+              cliente.direccion
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block rounded-xl border border-border bg-card p-4 text-base text-primary underline"
+          >
+            Ver dirección en OpenStreetMap
+          </a>
+        )
       )}
 
       {cliente.notas && (
