@@ -20,6 +20,7 @@ import {
   ProductoId,
   PRODUCTOS,
   etiquetaProducto,
+  DIAS_SEMANA,
 } from "@/lib/constants";
 import { saveTransaccionCliente } from "@/app/actions";
 import {
@@ -29,6 +30,7 @@ import {
   Package,
   Banknote,
   CheckCircle2,
+  CalendarDays,
 } from "lucide-react";
 
 type Cliente = {
@@ -36,6 +38,7 @@ type Cliente = {
   nombre: string;
   telefono: string | null;
   direccion: string | null;
+  dias: string[] | null;
   lat: number | null;
   lng: number | null;
   notas: string | null;
@@ -193,6 +196,27 @@ function CardInfo({ cliente }: { cliente: Cliente }) {
               <MapPin className="size-5" />
             </div>
             <span className="break-words leading-snug">{cliente.direccion}</span>
+          </div>
+        )}
+        {cliente.dias && cliente.dias.length > 0 && (
+          <div className="flex items-start gap-3 text-base text-muted-foreground">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary">
+              <CalendarDays className="size-5" />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {cliente.dias.map((diaId) => {
+                const dia = DIAS_SEMANA.find((d) => d.id === diaId);
+                if (!dia) return null;
+                return (
+                  <span
+                    key={diaId}
+                    className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
+                  >
+                    {dia.labelLargo}
+                  </span>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

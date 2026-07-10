@@ -14,6 +14,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { saveCliente } from "@/app/actions";
+import { DIAS_SEMANA, DiaSemanaId } from "@/lib/constants";
 import { UserPlus } from "lucide-react";
 
 export function ClienteNuevoModal() {
@@ -24,13 +25,21 @@ export function ClienteNuevoModal() {
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
   const [direccion, setDireccion] = useState("");
+  const [dias, setDias] = useState<DiaSemanaId[]>([]);
   const [notas, setNotas] = useState("");
 
   function resetForm() {
     setNombre("");
     setTelefono("");
     setDireccion("");
+    setDias([]);
     setNotas("");
+  }
+
+  function toggleDia(dia: DiaSemanaId) {
+    setDias((prev) =>
+      prev.includes(dia) ? prev.filter((d) => d !== dia) : [...prev, dia]
+    );
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -43,6 +52,7 @@ export function ClienteNuevoModal() {
         telefono,
         direccion,
         notas,
+        dias,
       });
       toast.success("✅ Cliente guardado");
       setOpen(false);
@@ -126,6 +136,32 @@ export function ClienteNuevoModal() {
                 onChange={(e) => setDireccion(e.target.value)}
                 className="h-14 text-base"
               />
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-base">Días de visita</Label>
+              <div className="grid grid-cols-7 gap-2">
+                {DIAS_SEMANA.map((dia) => {
+                  const activo = dias.includes(dia.id);
+                  return (
+                    <button
+                      key={dia.id}
+                      type="button"
+                      onClick={() => toggleDia(dia.id)}
+                      className={`flex h-14 flex-col items-center justify-center rounded-xl border text-sm font-medium transition-colors ${
+                        activo
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
+                      }`}
+                    >
+                      <span>{dia.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Tocá los días en los que se visita este cliente.
+              </p>
             </div>
 
             <div className="space-y-2">

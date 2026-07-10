@@ -43,6 +43,7 @@ export type Database = {
         Row: {
           activo: boolean | null
           created_at: string | null
+          dias: string[] | null
           direccion: string | null
           id: string
           lat: number | null
@@ -54,6 +55,7 @@ export type Database = {
         Insert: {
           activo?: boolean | null
           created_at?: string | null
+          dias?: string[] | null
           direccion?: string | null
           id?: string
           lat?: number | null
@@ -65,6 +67,7 @@ export type Database = {
         Update: {
           activo?: boolean | null
           created_at?: string | null
+          dias?: string[] | null
           direccion?: string | null
           id?: string
           lat?: number | null

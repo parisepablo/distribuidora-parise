@@ -15,6 +15,18 @@ export const CATEGORIAS_GASTO = [
 
 export type CategoriaGastoId = (typeof CATEGORIAS_GASTO)[number]["id"];
 
+export const DIAS_SEMANA = [
+  { id: "lunes" as const, label: "Lun", labelLargo: "Lunes" },
+  { id: "martes" as const, label: "Mar", labelLargo: "Martes" },
+  { id: "miercoles" as const, label: "Mié", labelLargo: "Miércoles" },
+  { id: "jueves" as const, label: "Jue", labelLargo: "Jueves" },
+  { id: "viernes" as const, label: "Vie", labelLargo: "Viernes" },
+  { id: "sabado" as const, label: "Sáb", labelLargo: "Sábado" },
+  { id: "domingo" as const, label: "Dom", labelLargo: "Domingo" },
+] as const;
+
+export type DiaSemanaId = (typeof DIAS_SEMANA)[number]["id"];
+
 export function formatearDinero(valor: number): string {
   return new Intl.NumberFormat("es-AR", {
     style: "currency",

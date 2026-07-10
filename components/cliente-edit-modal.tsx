@@ -14,6 +14,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { updateCliente } from "@/app/actions";
+import { DIAS_SEMANA, DiaSemanaId } from "@/lib/constants";
 import { Pencil } from "lucide-react";
 
 type Cliente = {
@@ -21,6 +22,7 @@ type Cliente = {
   nombre: string;
   telefono: string | null;
   direccion: string | null;
+  dias: string[] | null;
   lat: number | null;
   lng: number | null;
   notas: string | null;
@@ -34,7 +36,16 @@ export function ClienteEditModal({ cliente }: { cliente: Cliente }) {
   const [nombre, setNombre] = useState(cliente.nombre);
   const [telefono, setTelefono] = useState(cliente.telefono ?? "");
   const [direccion, setDireccion] = useState(cliente.direccion ?? "");
+  const [dias, setDias] = useState<DiaSemanaId[]>(
+    (cliente.dias as DiaSemanaId[]) ?? []
+  );
   const [notas, setNotas] = useState(cliente.notas ?? "");
+
+  function toggleDia(dia: DiaSemanaId) {
+    setDias((prev) =>
+      prev.includes(dia) ? prev.filter((d) => d !== dia) : [...prev, dia]
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,6 +58,7 @@ export function ClienteEditModal({ cliente }: { cliente: Cliente }) {
         telefono,
         direccion,
         notas,
+        dias,
       });
       toast.success("✅ Cliente actualizado");
       setOpen(false);
@@ -128,6 +140,29 @@ export function ClienteEditModal({ cliente }: { cliente: Cliente }) {
                 onChange={(e) => setDireccion(e.target.value)}
                 className="h-14 text-base"
               />
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-base">Días de visita</Label>
+              <div className="grid grid-cols-7 gap-2">
+                {DIAS_SEMANA.map((dia) => {
+                  const activo = dias.includes(dia.id);
+                  return (
+                    <button
+                      key={dia.id}
+                      type="button"
+                      onClick={() => toggleDia(dia.id)}
+                      className={`flex h-14 flex-col items-center justify-center rounded-xl border text-sm font-medium transition-colors ${
+                        activo
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-card text-muted-foreground hover:bg-secondary/50"
+                      }`}
+                    >
+                      <span>{dia.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="space-y-2">

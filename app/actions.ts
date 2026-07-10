@@ -434,7 +434,7 @@ export async function getClientes() {
 
   const { data, error } = await supabase
     .from("clientes")
-    .select("id, nombre, telefono, direccion, activo")
+    .select("id, nombre, telefono, direccion, dias, activo")
     .eq("activo", true)
     .order("nombre", { ascending: true });
 
@@ -450,15 +450,13 @@ export async function saveCliente({
   telefono,
   direccion,
   notas,
-  lat,
-  lng,
+  dias,
 }: {
   nombre: string;
   telefono?: string;
   direccion?: string;
   notas?: string;
-  lat?: number;
-  lng?: number;
+  dias?: string[];
 }) {
   const supabase = await createClient();
 
@@ -467,8 +465,7 @@ export async function saveCliente({
     telefono: telefono?.trim() || null,
     direccion: direccion?.trim() || null,
     notas: notas?.trim() || null,
-    lat: lat ?? null,
-    lng: lng ?? null,
+    dias: dias ?? [],
   });
 
   if (error) {
@@ -485,16 +482,14 @@ export async function updateCliente({
   telefono,
   direccion,
   notas,
-  lat,
-  lng,
+  dias,
 }: {
   id: string;
   nombre: string;
   telefono?: string;
   direccion?: string;
   notas?: string;
-  lat?: number;
-  lng?: number;
+  dias?: string[];
 }) {
   const supabase = await createClient();
 
@@ -505,8 +500,7 @@ export async function updateCliente({
       telefono: telefono?.trim() || null,
       direccion: direccion?.trim() || null,
       notas: notas?.trim() || null,
-      lat: lat ?? null,
-      lng: lng ?? null,
+      dias: dias ?? [],
     })
     .eq("id", id);
 
@@ -524,7 +518,7 @@ export async function getCliente(id: string) {
 
   const { data, error } = await supabase
     .from("clientes")
-    .select("id, nombre, telefono, direccion, lat, lng, notas, activo")
+    .select("id, nombre, telefono, direccion, dias, lat, lng, notas, activo")
     .eq("id", id)
     .maybeSingle();
 

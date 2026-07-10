@@ -2,10 +2,22 @@ import Link from "next/link";
 import { getClientes } from "@/app/actions";
 import { ClienteNuevoModal } from "@/components/cliente-nuevo-modal";
 import { Card, CardContent } from "@/components/ui/card";
-import { Phone, MapPin, ChevronRight, Users } from "lucide-react";
+import { DIAS_SEMANA } from "@/lib/constants";
+import { Phone, MapPin, ChevronRight, Users, CalendarDays } from "lucide-react";
 
-export default async function ClientesPage() {
+export default async function ClientesPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const dia = typeof searchParams.dia === "string" ? searchParams.dia : null;
   const clientes = await getClientes();
+
+  const clientesFiltrados = dia
+    ? clientes.filter(
+        (c) => c.dias && (c.dias as string[]).includes(dia)
+      )
+    : clientes;
 
   return (
     <section className="space-y-6">
@@ -16,17 +28,53 @@ export default async function ClientesPage() {
         </p>
       </div>
 
-      {clientes.length === 0 ? (
+      <div className="space-y-3">
+        <p className="text-sm font-medium text-muted-foreground">
+          Filtrar por día de visita
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/clientes"
+            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+              dia === null
+                ? "bg-primary text-primary-foreground"
+                : "border border-border bg-card text-muted-foreground hover:bg-secondary/50"
+            }`}
+          >
+            Todos
+          </Link>
+          {DIAS_SEMANA.map((d) => {
+            const activo = dia === d.id;
+            return (
+              <Link
+                key={d.id}
+                href={`/clientes?dia=${d.id}`}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  activo
+                    ? "bg-primary text-primary-foreground"
+                    : "border border-border bg-card text-muted-foreground hover:bg-secondary/50"
+                }`}
+              >
+                {d.labelLargo}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {clientesFiltrados.length === 0 ? (
         <div className="rounded-2xl border border-border bg-card p-8 text-center">
           <Users className="mx-auto mb-4 size-14 text-muted-foreground" />
           <p className="text-lg font-medium text-foreground">Sin clientes aún</p>
           <p className="mt-1 text-base text-muted-foreground">
-            Agregá un cliente para llevar su cuenta y dirección de entrega.
+            {dia
+              ? "No hay clientes asignados para este día."
+              : "Agregá un cliente para llevar su cuenta y dirección de entrega."}
           </p>
         </div>
       ) : (
         <div className="space-y-3">
-          {clientes.map((cliente) => (
+          {clientesFiltrados.map((cliente) => (
             <Link key={cliente.id} href={`/clientes/${cliente.id}`}>
               <Card className="border-border transition-colors hover:border-primary/50 hover:bg-secondary/30">
                 <CardContent className="flex items-center gap-4 p-4">
@@ -48,6 +96,19 @@ export default async function ClientesPage() {
                         <span className="flex items-center gap-1 truncate">
                           <MapPin className="size-4" />
                           <span className="truncate">{cliente.direccion}</span>
+                        </span>
+                      )}
+                      {cliente.dias && cliente.dias.length > 0 && (
+                        <span className="flex items-center gap-1">
+                          <CalendarDays className="size-4" />
+                          <span className="truncate">
+                            {cliente.dias
+                              .map(
+                                (diaId) =>
+                                  DIAS_SEMANA.find((d) => d.id === diaId)?.label
+                              )
+                              .join(", ")}
+                          </span>
                         </span>
                       )}
                     </div>
