@@ -22,11 +22,7 @@ const markerIcon = new Icon({
   shadowSize: [41, 41],
 });
 
-function MapCenter({
-  center,
-}: {
-  center: LatLngExpression;
-}) {
+function MapCenter({ center }: { center: LatLngExpression }) {
   const map = useMap();
   useEffect(() => {
     map.setView(center, 16);
@@ -130,13 +126,13 @@ export function MapPicker({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && buscar()}
-            className="h-12 flex-1 text-base"
+            className="h-14 flex-1 text-base"
           />
           <Button
             type="button"
             onClick={buscar}
             disabled={buscando || !query.trim()}
-            className="h-12 px-4"
+            className="h-14 px-4"
           >
             <Search className="size-5" />
           </Button>
@@ -151,7 +147,7 @@ export function MapPicker({
           <p className="text-sm font-medium text-muted-foreground">
             Resultados
           </p>
-          <div className="max-h-40 space-y-2 overflow-y-auto pr-1">
+          <div className="max-h-36 space-y-2 overflow-y-auto pr-1">
             {resultados.map((r) => {
               const localidad =
                 r.address?.city ?? r.address?.town ?? r.address?.village;
@@ -163,7 +159,7 @@ export function MapPicker({
                   key={r.place_id}
                   type="button"
                   onClick={() => setSeleccionado(r)}
-                  className={`w-full rounded-xl border p-3 text-left text-sm transition-colors ${
+                  className={`w-full rounded-xl border p-4 text-left text-sm transition-colors ${
                     isSelected
                       ? "border-primary bg-primary/10 text-foreground"
                       : "border-border bg-card hover:bg-secondary/50"
@@ -184,12 +180,12 @@ export function MapPicker({
         </div>
       )}
 
-      <div className="relative min-h-[220px] flex-1 overflow-hidden rounded-2xl border border-border">
+      <div className="relative min-h-0 flex-1 overflow-hidden rounded-2xl border border-border">
         <MapContainer
           center={centroActual}
           zoom={16}
           scrollWheelZoom={false}
-          className="h-full min-h-[220px] w-full"
+          className="h-full w-full"
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

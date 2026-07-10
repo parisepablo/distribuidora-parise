@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sheet";
 import { MapPicker } from "@/components/map-picker";
 import { updateCliente } from "@/app/actions";
-import { Pencil, MapPin, X } from "lucide-react";
+import { Pencil, MapPin, ArrowLeft } from "lucide-react";
 
 type Cliente = {
   id: string;
@@ -56,6 +56,7 @@ export function ClienteEditModal({ cliente }: { cliente: Cliente }) {
       });
       toast.success("✅ Cliente actualizado");
       setOpen(false);
+      setMostrarMapa(false);
       router.refresh();
     } catch (err) {
       toast.error(
@@ -93,20 +94,20 @@ export function ClienteEditModal({ cliente }: { cliente: Cliente }) {
       </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom" className="h-[92vh] rounded-t-3xl">
-          <SheetHeader className="text-left">
-            <SheetTitle className="text-xl">Editar cliente</SheetTitle>
-            <SheetDescription className="text-base">
-              Modificá los datos y la ubicación en el mapa.
-            </SheetDescription>
-          </SheetHeader>
+        <SheetContent side="bottom" className="flex h-[92vh] flex-col rounded-t-3xl">
+          {!mostrarMapa ? (
+            <>
+              <SheetHeader className="text-left">
+                <SheetTitle className="text-xl">Editar cliente</SheetTitle>
+                <SheetDescription className="text-base">
+                  Modificá los datos y la ubicación en el mapa.
+                </SheetDescription>
+              </SheetHeader>
 
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-1 flex-col gap-5 overflow-y-auto p-1 pt-4"
-          >
-            {!mostrarMapa ? (
-              <>
+              <form
+                onSubmit={handleSubmit}
+                className="flex flex-1 flex-col gap-5 overflow-y-auto p-1 pt-4"
+              >
                 <div className="space-y-2">
                   <Label htmlFor="editar-nombre" className="text-base">
                     Nombre
@@ -138,7 +139,7 @@ export function ClienteEditModal({ cliente }: { cliente: Cliente }) {
                 <div className="space-y-2">
                   <Label className="text-base">Dirección</Label>
                   {direccion ? (
-                    <div className="flex items-start gap-2 rounded-xl border border-border bg-secondary/40 p-4">
+                    <div className="flex items-start gap-3 rounded-xl border border-border bg-secondary/40 p-5">
                       <MapPin className="mt-0.5 size-5 shrink-0 text-primary" />
                       <div className="min-w-0 flex-1">
                         <p className="text-base leading-snug">{direccion}</p>
@@ -194,33 +195,33 @@ export function ClienteEditModal({ cliente }: { cliente: Cliente }) {
                     Cancelar
                   </Button>
                 </div>
-              </>
-            ) : (
-              <div className="flex h-full flex-col">
-                <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Elegir ubicación</h3>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setMostrarMapa(false)}
-                    className="h-10 w-10"
-                  >
-                    <X className="size-5" />
-                  </Button>
-                </div>
-                <div className="flex-1">
-                  <MapPicker
-                    initialDireccion={direccion}
-                    initialLat={lat}
-                    initialLng={lng}
-                    onConfirm={handleUbicacionSeleccionada}
-                    onCancel={() => setMostrarMapa(false)}
-                  />
-                </div>
+              </form>
+            </>
+          ) : (
+            <div className="flex h-full flex-col overflow-hidden">
+              <div className="mb-4 flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMostrarMapa(false)}
+                  className="h-10 w-10 shrink-0"
+                >
+                  <ArrowLeft className="size-5" />
+                </Button>
+                <h3 className="text-lg font-semibold">Elegir ubicación</h3>
               </div>
-            )}
-          </form>
+              <div className="min-h-0 flex-1">
+                <MapPicker
+                  initialDireccion={direccion}
+                  initialLat={lat}
+                  initialLng={lng}
+                  onConfirm={handleUbicacionSeleccionada}
+                  onCancel={() => setMostrarMapa(false)}
+                />
+              </div>
+            </div>
+          )}
         </SheetContent>
       </Sheet>
     </>

@@ -172,7 +172,7 @@ export function InicioForm({
         </div>
 
         <Card className="border-border bg-gradient-to-br from-card to-secondary/30">
-          <CardHeader className="pb-2">
+          <CardHeader className="p-5 pb-3">
             <CardDescription className="text-base">
               Hoy cobré
             </CardDescription>
@@ -180,9 +180,9 @@ export function InicioForm({
               {formatearDinero(registro.total_cobrado)}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="space-y-5 p-5 pt-0">
             {ventasGuardadas.length > 0 && (
-              <div className="rounded-xl bg-secondary/50 p-4">
+              <div className="rounded-xl bg-secondary/50 p-5">
                 <p className="mb-2 text-base font-medium">Ventas registradas</p>
                 <ul className="space-y-2 text-base">
                   {ventasGuardadas.map((v) => (
@@ -204,7 +204,7 @@ export function InicioForm({
             )}
 
             {registro.notas && (
-              <div className="rounded-xl bg-secondary/50 p-4">
+              <div className="rounded-xl bg-secondary/50 p-5">
                 <p className="text-base leading-relaxed text-foreground">
                   {registro.notas}
                 </p>
@@ -264,13 +264,13 @@ export function InicioForm({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card className="border-border">
-          <CardHeader className="pb-3">
+          <CardHeader className="p-5 pb-3">
             <CardTitle className="text-lg">Lo que vendiste hoy</CardTitle>
             <CardDescription className="text-base">
               Opcional. Si no vendiste nada, dejá todo en 0.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 p-5 pt-0">
             {PRODUCTOS.map((p) => {
               const cantidad = quantities.get(p.id) || "";
               const precio = preciosMap.get(p.id) ?? 0;
@@ -279,7 +279,7 @@ export function InicioForm({
               return (
                 <div
                   key={p.id}
-                  className="flex items-center gap-4 rounded-xl bg-secondary/40 p-4"
+                  className="flex items-center gap-4 rounded-xl bg-secondary/40 p-5"
                 >
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary text-2xl">
                     {ICONOS_PRODUCTO[p.id]}
@@ -310,7 +310,7 @@ export function InicioForm({
               );
             })}
 
-            <div className="flex items-center justify-between rounded-xl bg-primary/10 p-4">
+            <div className="flex items-center justify-between rounded-xl bg-primary/10 p-5">
               <span className="text-base font-medium text-primary-foreground/80">
                 Subtotal calculado
               </span>
@@ -322,13 +322,13 @@ export function InicioForm({
         </Card>
 
         <Card className="border-border">
-          <CardHeader className="pb-3">
+          <CardHeader className="p-5 pb-3">
             <CardTitle className="text-lg">Total cobrado en efectivo</CardTitle>
             <CardDescription className="text-base">
               Podés modificarlo si cobraste otro monto.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-5 pt-0">
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-muted-foreground">
                 $
@@ -349,10 +349,10 @@ export function InicioForm({
         </Card>
 
         <Card className="border-border">
-          <CardHeader className="pb-3">
+          <CardHeader className="p-5 pb-3">
             <CardTitle className="text-lg">Notas del día</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-5 pt-0">
             <textarea
               id="notas"
               rows={3}

@@ -56,7 +56,7 @@ export default function RootLayout({
           </div>
         </header>
 
-        <main className="mx-auto min-h-[calc(100vh-10rem)] max-w-md px-5 pb-32 pt-6">
+        <main className="mx-auto min-h-[calc(100vh-10rem)] max-w-md px-6 pb-32 pt-6">
           {children}
         </main>
 
