@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getClientes } from "@/app/actions";
 import { ClienteNuevoModal } from "@/components/cliente-nuevo-modal";
+import { ClientesDayFilter } from "@/components/clientes-day-filter";
 import { Card, CardContent } from "@/components/ui/card";
 import { DIAS_SEMANA } from "@/lib/constants";
 import { Phone, MapPin, ChevronRight, Users, CalendarDays } from "lucide-react";
@@ -28,39 +29,7 @@ export default async function ClientesPage({
         </p>
       </div>
 
-      <div className="space-y-3">
-        <p className="text-sm font-medium text-muted-foreground">
-          Filtrar por día de visita
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href="/clientes"
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              dia === null
-                ? "bg-primary text-primary-foreground"
-                : "border border-border bg-card text-muted-foreground hover:bg-secondary/50"
-            }`}
-          >
-            Todos
-          </Link>
-          {DIAS_SEMANA.map((d) => {
-            const activo = dia === d.id;
-            return (
-              <Link
-                key={d.id}
-                href={`/clientes?dia=${d.id}`}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                  activo
-                    ? "bg-primary text-primary-foreground"
-                    : "border border-border bg-card text-muted-foreground hover:bg-secondary/50"
-                }`}
-              >
-                {d.labelLargo}
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+      <ClientesDayFilter dia={dia} />
 
       {clientesFiltrados.length === 0 ? (
         <div className="rounded-2xl border border-border bg-card p-8 text-center">
