@@ -54,11 +54,6 @@
   }
 }
 
-/* Leaflet dark map tiles look better with a slight brightness adjustment */
-.leaflet-layer {
-  filter: brightness(0.85) contrast(1.05);
-}
-
 /* Hide horizontal overflow on sheets */
 [data-slot="sheet-content"] {
   max-width: 100vw;

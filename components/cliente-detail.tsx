@@ -13,7 +13,6 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { MapView } from "@/components/map-view";
 import { ClienteEditModal } from "@/components/cliente-edit-modal";
 import {
   formatearDinero,
@@ -71,25 +70,17 @@ export function ClienteDetail({
     <section className="space-y-6">
       <CardInfo cliente={cliente} />
 
-      {cliente.lat != null && cliente.lng != null ? (
-        <MapView
-          lat={cliente.lat}
-          lng={cliente.lng}
-          label={cliente.direccion ?? undefined}
-        />
-      ) : (
-        cliente.direccion && (
-          <a
-            href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(
-              cliente.direccion
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block rounded-xl border border-border bg-card p-4 text-base text-primary underline underline-offset-2"
-          >
-            Ver dirección en OpenStreetMap
-          </a>
-        )
+      {cliente.direccion && (
+        <a
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+            cliente.direccion
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block rounded-xl border border-border bg-card p-4 text-base text-primary underline underline-offset-2"
+        >
+          Ver dirección en Google Maps
+        </a>
       )}
 
       {cliente.notas && (
